@@ -1,29 +1,35 @@
 import { BrowserRouter as Router } from "react-router-dom";
-import { useState, createContext, useContext } from "react";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/navbar";
 import AppRoutes from "./routes/AppRoutes";
+import ContextProvider from "./context/ContextProvider";
+import { useContext } from "react";
+import AuthContext from "./context/AuthContext";
 
-// Context untuk autentikasi
-const AuthContext = createContext(null);
-
+// Custom hook untuk Auth
 export const useAuth = () => useContext(AuthContext);
 
 function App() {
-  const [user, setUser] = useState(null);
+  return (
+    <Router>
+      <ContextProvider>
+        <MainLayout />
+      </ContextProvider>
+    </Router>
+  );
+}
+
+function MainLayout() {
+  const { user } = useAuth();
 
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
-      <Router>
-        <div className="flex">
-          {user ? <Sidebar /> : null} {/* Pastikan user tidak null sebelum menampilkan Sidebar */}
-          <div className="flex-1 p-4">
-            <Navbar />
-            <AppRoutes /> {/* Menggunakan AppRoutes untuk mengelola semua Routes */}
-          </div>
-        </div>
-      </Router>
-    </AuthContext.Provider>
+    <div className="flex">
+      {user && <Sidebar />}
+      <div className="flex-1 p-4">
+        <Navbar />
+        <AppRoutes />
+      </div>
+    </div>
   );
 }
 
